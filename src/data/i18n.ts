@@ -50,7 +50,7 @@ export const STRINGS: Record<Locale, StringBundle> = {
     },
     hero: {
       boot: ['> Initializing 550W × 1...', '> A one-person civilization, growing slowly.'],
-      byline: "I'm YM, writing code in Singapore. This is my server, garden, and spacecraft.",
+      byline: "I'm YM, writing code in Singapore. This is our server, garden, and spacecraft.",
       easter: 'The period is a choice. Click it.',
     },
     manifesto: {
@@ -71,7 +71,7 @@ export const STRINGS: Record<Locale, StringBundle> = {
     footer: {
       system: 'system: moss.sg',
       uptime: 'uptime: since 2026',
-      operator: 'operator: YM',
+      operator: 'operator: YM × LY',
       status: 'status: growing',
       quote: 'The only way to ensure continuity is to keep our sanity — and a bit of humor.',
     },
@@ -85,7 +85,7 @@ export const STRINGS: Record<Locale, StringBundle> = {
     },
     hero: {
       boot: ['> 正在初始化 550W × 1...', '> 一个人的文明，在缓慢生长。'],
-      byline: '我是 YM，在新加坡写代码。这里是我的服务器、花园，和飞船。',
+      byline: '我是 YM，在新加坡写代码。这里是我们的服务器、花园，和飞船。',
       easter: '这个句号是刻意的。点一下。',
     },
     manifesto: {
@@ -107,7 +107,7 @@ export const STRINGS: Record<Locale, StringBundle> = {
     footer: {
       system: 'system: moss.sg',
       uptime: 'uptime: since 2026',
-      operator: 'operator: YM',
+      operator: 'operator: YM × LY',
       status: 'status: growing',
       quote: '延续文明的唯一方法，是保持理智 —— 和一点幽默感。',
     },
