@@ -26,8 +26,8 @@ export interface StringBundle {
 const DIRECTIVES: DirectiveItem[] = [
   {
     n: '01',
-    en: 'Build small things that compound.',
-    zh: '做小的、会复利的事。',
+    en: 'Build small things. Enjoy the making.',
+    zh: '做小的事，享受做本身。',
   },
   {
     n: '02',
