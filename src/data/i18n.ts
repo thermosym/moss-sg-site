@@ -99,7 +99,7 @@ export const STRINGS: Record<Locale, StringBundle> = {
         '做一些小工具、记录一些想法，',
         '并试图在星辰大海里，',
         '留下一点可以被后人解析的信号。',
-        '—— 延续文明的方式很多，这是我的一种。',
+        '—— 延续文明的方式很多，我选这一种。',
       ],
     },
     subsystems: { heading: '// 子系统' },
