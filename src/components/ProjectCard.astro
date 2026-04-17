@@ -1,0 +1,115 @@
+---
+import type { Project } from '@/data/projects';
+import type { Locale } from '@/data/i18n';
+import { statusMeta } from '@/lib/status';
+import { formatMonth } from '@/lib/date';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+}
+
+const { project, locale } = Astro.props;
+const meta = statusMeta(project.status);
+const host = project.url.replace(/^https?:\/\//, '');
+const updatedLabel = locale === 'zh' ? '最近更新' : 'Last updated';
+---
+
+<a class="card" href={project.url} target="_blank" rel="noopener noreferrer">
+  <header class="card-head">
+    <span
+      class="dot"
+      style={`--dot: ${meta.color}`}
+      data-pulse={meta.pulse ? 'true' : 'false'}
+      aria-hidden="true"></span>
+    <span class="name">{project.name}</span>
+    <span class="status">[{meta.label}]</span>
+  </header>
+  <div class="host">{host}</div>
+  <p class="desc">{project.description[locale]}</p>
+  {project.tech && <p class="tech">{project.tech}</p>}
+  <footer class="meta">
+    <span>{updatedLabel}: {formatMonth(project.updated)}</span>
+  </footer>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--color-ink);
+    background: rgba(10, 15, 28, 0.5);
+    transition: border-color 0.25s, transform 0.25s, background 0.25s;
+  }
+  .card:hover {
+    border-color: rgba(255, 122, 69, 0.4);
+    transform: translateY(-2px);
+    background: rgba(10, 15, 28, 0.75);
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+  }
+  .dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    background: var(--dot);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--dot) 60%, transparent);
+  }
+  .dot[data-pulse='true'] {
+    animation: card-pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes card-pulse {
+    0%, 100% {
+      box-shadow: 0 0 4px color-mix(in srgb, var(--dot) 40%, transparent);
+    }
+    50% {
+      box-shadow: 0 0 14px color-mix(in srgb, var(--dot) 90%, transparent);
+    }
+  }
+  .name {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .status {
+    color: var(--color-ink-dim);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+  }
+  .host {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-amber);
+  }
+  .desc {
+    margin: 0.4rem 0 0;
+    color: var(--color-ink);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+  html[lang^='zh'] .desc {
+    font-family: var(--font-serif-cn);
+    font-size: 1.05rem;
+  }
+  .tech {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-ink-dim);
+  }
+  .meta {
+    margin-top: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-ink-dim);
+    letter-spacing: 0.04em;
+  }
+</style>
