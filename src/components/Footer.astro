@@ -1,0 +1,54 @@
+---
+import { STRINGS, type Locale } from '@/data/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = STRINGS[locale].footer;
+---
+
+<footer class="footer" role="contentinfo">
+  <div class="bar">
+    <span>[ {t.system} ]</span>
+    <span>[ {t.uptime} ]</span>
+    <span>[ {t.operator} ]</span>
+    <span>[ {t.status} <span class="blink">_</span> ]</span>
+  </div>
+  <p class="quote">{t.quote}</p>
+</footer>
+
+<style>
+  .footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    color: var(--color-ink-dim);
+  }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+  }
+  .blink {
+    color: var(--color-amber);
+    animation: tw-blink 1.4s steps(1) infinite;
+  }
+  .quote {
+    margin: 0;
+    font-family: var(--font-serif-cn);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 40rem;
+  }
+  html[lang='en'] .quote {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+</style>
