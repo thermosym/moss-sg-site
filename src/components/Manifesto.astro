@@ -1,0 +1,44 @@
+---
+import { STRINGS, type Locale } from '@/data/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = STRINGS[locale].manifesto;
+---
+
+<section class="manifesto" aria-labelledby="manifesto-heading">
+  <h2 id="manifesto-heading" class="section-heading">{t.heading}</h2>
+  <div class="prose">
+    {t.body.map((line) => <p>{line}</p>)}
+  </div>
+</section>
+
+<style>
+  .section-heading {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-amber);
+    letter-spacing: 0.12em;
+    margin: 0 0 2rem;
+  }
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    color: var(--color-ink);
+    line-height: 1.8;
+    max-width: 40rem;
+    font-size: 0.98rem;
+  }
+  .prose p {
+    margin: 0;
+  }
+  html[lang^='zh'] .prose {
+    font-family: var(--font-serif-cn);
+    font-size: 1.1rem;
+    line-height: 2;
+  }
+</style>
