@@ -1,0 +1,37 @@
+---
+import { STRINGS, type Locale } from '@/data/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = STRINGS[locale].langToggle;
+---
+
+<a href={t.href} class="lang-toggle" aria-label={`Switch language to ${t.label}`}>
+  {t.label}
+</a>
+
+<style>
+  .lang-toggle {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.5rem;
+    z-index: 10;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-ink-dim);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: color 0.25s, border-color 0.25s;
+    background: rgba(10, 15, 28, 0.55);
+    backdrop-filter: blur(6px);
+  }
+  .lang-toggle:hover {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+</style>

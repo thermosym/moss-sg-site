@@ -1,0 +1,78 @@
+---
+import '@/styles/global.css';
+import Starfield from '@/components/Starfield.astro';
+import LangToggle from '@/components/LangToggle.astro';
+import { STRINGS, type Locale } from '@/data/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = STRINGS[locale];
+const htmlLang = locale === 'zh' ? 'zh-CN' : 'en';
+---
+
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{t.meta.title}</title>
+    <meta name="description" content={t.meta.description} />
+    <meta property="og:title" content={t.meta.title} />
+    <meta property="og:description" content={t.meta.description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.site?.toString() ?? 'https://moss.sg/'} />
+    <link rel="alternate" hreflang="en" href="https://moss.sg/" />
+    <link rel="alternate" hreflang="zh-CN" href="https://moss.sg/zh/" />
+    <link rel="alternate" hreflang="x-default" href="https://moss.sg/" />
+  </head>
+  <body>
+    <Starfield />
+    <LangToggle locale={locale} />
+    <main class="shell">
+      <slot />
+    </main>
+
+    <style>
+      .shell {
+        position: relative;
+        z-index: 1;
+        max-width: 64rem;
+        margin: 0 auto;
+        padding: 6rem 1.5rem 4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 6rem;
+      }
+      @media (min-width: 768px) {
+        .shell {
+          padding: 8rem 3rem 6rem;
+        }
+      }
+    </style>
+
+    <script>
+      // Console easter eggs — see Task 15 for the ASCII art source.
+      const ASCII_MOSS = [
+        '       .-""""-.  ',
+        "      '        \\ ",
+        "     /   MOSS   \\",
+        "    /   550W × 1 \\",
+        "    '--.______.--'",
+      ].join('\n');
+      // eslint-disable-next-line no-console
+      console.log('%c550W online.', 'color:#ff7a45; font-family: monospace; font-size: 14px;');
+      // eslint-disable-next-line no-console
+      console.log('%c' + ASCII_MOSS, 'color:#6fae7a; font-family: monospace; font-size: 11px;');
+      // eslint-disable-next-line no-console
+      console.log(
+        "%cMoss doesn't fight crawlers. It outlives them.",
+        'color:#8a93a6; font-family: monospace;',
+      );
+    </script>
+  </body>
+</html>
