@@ -36,8 +36,8 @@ const DIRECTIVES: DirectiveItem[] = [
   },
   {
     n: '03',
-    en: 'Learn in public. Ship in silence.',
-    zh: '公开地学习，安静地交付。',
+    en: 'Learn in public. Grow in private.',
+    zh: '公开地学习，默默地生长。',
   },
 ];
 
