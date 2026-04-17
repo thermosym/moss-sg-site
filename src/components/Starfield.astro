@@ -1,0 +1,303 @@
+---
+// Full-viewport canvas background with 3 parallax layers, nebula, MOSS eye, meteors.
+// Reference: Downloads/moss_starfield_v2.html, adapted to full viewport + reduced-motion.
+---
+
+<canvas id="moss-stars" aria-hidden="true"></canvas>
+
+<style>
+  #moss-stars {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    background: #050509;
+    display: block;
+  }
+</style>
+
+<script>
+  type FarStar = { x: number; y: number; r: number; a: number; phase: number };
+  type LayerStar = {
+    x: number;
+    y: number;
+    z: number;
+    r: number;
+    amber: boolean;
+    phase: number;
+  };
+  type Meteor = { x: number; y: number; vx: number; vy: number; life: number };
+
+  const canvas = document.getElementById('moss-stars') as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext('2d') ?? null;
+
+  if (canvas && ctx) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const reducedMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let reduced = reducedMQ.matches;
+
+    let w = 0;
+    let h = 0;
+    let cx = 0;
+    let cy = 0;
+    let eyeY = 0;
+
+    let farStars: FarStar[] = [];
+    let midStars: LayerStar[] = [];
+    let nearStars: LayerStar[] = [];
+    let meteors: Meteor[] = [];
+
+    let mx = 0;
+    let my = 0;
+    let tx = 0;
+    let ty = 0;
+    let rafId = 0;
+
+    function resize() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      cx = w / 2;
+      cy = h / 2;
+      eyeY = h * 0.28; // lift the eye so hero title sits in the halo
+      canvas!.width = w * dpr;
+      canvas!.height = h * dpr;
+      canvas!.style.width = w + 'px';
+      canvas!.style.height = h + 'px';
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function seed() {
+      farStars = [];
+      midStars = [];
+      nearStars = [];
+      const density = (w * h) / (1440 * 820);
+      const farN = Math.round(160 * density);
+      const midN = Math.round(90 * density);
+      const nearN = Math.round(14 * density);
+      for (let i = 0; i < farN; i++) {
+        farStars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 0.7 + 0.2,
+          a: Math.random() * 0.5 + 0.2,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+      for (let i = 0; i < midN; i++) {
+        midStars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          z: Math.random() * 0.5 + 0.4,
+          r: Math.random() * 1.0 + 0.4,
+          amber: Math.random() < 0.1,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+      for (let i = 0; i < nearN; i++) {
+        nearStars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          z: Math.random() * 0.4 + 0.6,
+          r: Math.random() * 1.2 + 1.2,
+          amber: Math.random() < 0.25,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+
+    function nebula() {
+      ctx!.save();
+      ctx!.translate(cx, cy);
+      ctx!.rotate(-Math.PI / 5);
+      ctx!.scale(2.8, 0.35);
+      const g = ctx!.createRadialGradient(0, 0, 0, 0, 0, w * 0.7);
+      g.addColorStop(0, 'rgba(120, 130, 210, 0.16)');
+      g.addColorStop(0.5, 'rgba(140, 90, 190, 0.09)');
+      g.addColorStop(1, 'rgba(120, 130, 210, 0)');
+      ctx!.fillStyle = g;
+      ctx!.fillRect(-w * 2, -h * 2, w * 4, h * 4);
+      ctx!.restore();
+    }
+
+    function eye(t: number, pulse: number) {
+      const g1 = ctx!.createRadialGradient(cx, eyeY, 0, cx, eyeY, 380);
+      g1.addColorStop(0, `rgba(255, 130, 50, ${0.16 * pulse})`);
+      g1.addColorStop(0.25, `rgba(255, 100, 40, ${0.06 * pulse})`);
+      g1.addColorStop(1, 'rgba(255, 130, 50, 0)');
+      ctx!.fillStyle = g1;
+      ctx!.fillRect(0, 0, w, h);
+
+      const g2 = ctx!.createRadialGradient(cx, eyeY, 0, cx, eyeY, 50);
+      g2.addColorStop(0, `rgba(255, 225, 160, ${0.9 * pulse})`);
+      g2.addColorStop(0.35, `rgba(255, 160, 80, ${0.55 * pulse})`);
+      g2.addColorStop(1, 'rgba(255, 130, 50, 0)');
+      ctx!.fillStyle = g2;
+      ctx!.beginPath();
+      ctx!.arc(cx, eyeY, 50, 0, Math.PI * 2);
+      ctx!.fill();
+
+      ctx!.beginPath();
+      ctx!.arc(cx, eyeY, 70 + Math.sin(t * 0.0008) * 4, 0, Math.PI * 2);
+      ctx!.strokeStyle = `rgba(255, 150, 80, ${0.18 * pulse})`;
+      ctx!.lineWidth = 1;
+      ctx!.stroke();
+
+      ctx!.beginPath();
+      ctx!.arc(cx, eyeY, 2.5, 0, Math.PI * 2);
+      ctx!.fillStyle = 'rgba(255, 240, 210, 1)';
+      ctx!.fill();
+    }
+
+    function flareStar(x: number, y: number, r: number, alpha: number, amber: boolean) {
+      const color = amber ? '255, 190, 120' : '220, 235, 255';
+      const core = amber ? '255, 225, 185' : '255, 255, 255';
+      ctx!.beginPath();
+      ctx!.arc(x, y, r, 0, Math.PI * 2);
+      ctx!.fillStyle = `rgba(${core}, ${alpha})`;
+      ctx!.fill();
+      const fl = r * 11;
+      const gh = ctx!.createLinearGradient(x - fl, y, x + fl, y);
+      gh.addColorStop(0, `rgba(${color}, 0)`);
+      gh.addColorStop(0.5, `rgba(${color}, ${alpha * 0.55})`);
+      gh.addColorStop(1, `rgba(${color}, 0)`);
+      ctx!.fillStyle = gh;
+      ctx!.fillRect(x - fl, y - 0.4, fl * 2, 0.8);
+      const gv = ctx!.createLinearGradient(x, y - fl, x, y + fl);
+      gv.addColorStop(0, `rgba(${color}, 0)`);
+      gv.addColorStop(0.5, `rgba(${color}, ${alpha * 0.55})`);
+      gv.addColorStop(1, `rgba(${color}, 0)`);
+      ctx!.fillStyle = gv;
+      ctx!.fillRect(x - 0.4, y - fl, 0.8, fl * 2);
+    }
+
+    function updateMeteors() {
+      if (!reduced && Math.random() < 0.005 && meteors.length < 2) {
+        const fromLeft = Math.random() < 0.5;
+        meteors.push({
+          x: fromLeft ? -20 : w + 20,
+          y: Math.random() * h * 0.5,
+          vx: fromLeft ? 5 + Math.random() * 3 : -5 - Math.random() * 3,
+          vy: 2 + Math.random() * 2,
+          life: 1.0,
+        });
+      }
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i];
+        const mag = Math.hypot(m.vx, m.vy);
+        const tailLen = 60;
+        const x2 = m.x - (m.vx / mag) * tailLen;
+        const y2 = m.y - (m.vy / mag) * tailLen;
+        const g = ctx!.createLinearGradient(m.x, m.y, x2, y2);
+        g.addColorStop(0, `rgba(255, 255, 255, ${m.life})`);
+        g.addColorStop(0.3, `rgba(200, 220, 255, ${m.life * 0.4})`);
+        g.addColorStop(1, 'rgba(200, 220, 255, 0)');
+        ctx!.strokeStyle = g;
+        ctx!.lineWidth = 1.4;
+        ctx!.lineCap = 'round';
+        ctx!.beginPath();
+        ctx!.moveTo(m.x, m.y);
+        ctx!.lineTo(x2, y2);
+        ctx!.stroke();
+        m.x += m.vx;
+        m.y += m.vy;
+        m.life -= 0.015;
+        if (m.life <= 0 || m.x < -80 || m.x > w + 80 || m.y > h + 80) {
+          meteors.splice(i, 1);
+        }
+      }
+    }
+
+    function draw(t: number) {
+      tx += (mx - tx) * 0.04;
+      ty += (my - ty) * 0.04;
+      const ox = tx + Math.sin(t * 0.00008) * 0.1;
+      const oy = ty + Math.cos(t * 0.0001) * 0.06;
+
+      ctx!.fillStyle = '#050509';
+      ctx!.fillRect(0, 0, w, h);
+      nebula();
+
+      for (const s of farStars) {
+        const tw = Math.sin(t * 0.0012 + s.phase) * 0.3 + 0.7;
+        ctx!.beginPath();
+        ctx!.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx!.fillStyle = `rgba(210, 220, 245, ${tw * s.a})`;
+        ctx!.fill();
+      }
+      for (const s of midStars) {
+        const px = s.x - ox * 40 * s.z;
+        const py = s.y - oy * 40 * s.z;
+        const tw = Math.sin(t * 0.0014 + s.phase) * 0.3 + 0.7;
+        ctx!.beginPath();
+        ctx!.arc(px, py, s.r * s.z, 0, Math.PI * 2);
+        ctx!.fillStyle = s.amber
+          ? `rgba(255, 190, 120, ${tw * s.z * 0.9})`
+          : `rgba(220, 235, 255, ${tw * s.z * 0.8})`;
+        ctx!.fill();
+      }
+
+      const pulse = Math.sin(t * 0.0012) * 0.25 + 0.75;
+      eye(t, pulse);
+
+      for (const s of nearStars) {
+        const px = s.x - ox * 85 * s.z;
+        const py = s.y - oy * 85 * s.z;
+        const tw = Math.sin(t * 0.001 + s.phase) * 0.3 + 0.7;
+        flareStar(px, py, s.r * s.z, tw * s.z * 0.95, s.amber);
+      }
+
+      updateMeteors();
+
+      if (!reduced) {
+        rafId = requestAnimationFrame(draw);
+      }
+    }
+
+    if (!isTouch) {
+      window.addEventListener(
+        'mousemove',
+        (e) => {
+          mx = (e.clientX - w / 2) / w;
+          my = (e.clientY - h / 2) / h;
+        },
+        { passive: true },
+      );
+    } else {
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma !== null && e.beta !== null) {
+          mx = Math.max(-0.5, Math.min(0.5, e.gamma / 40));
+          my = Math.max(-0.5, Math.min(0.5, (e.beta - 30) / 40));
+        }
+      });
+    }
+
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(rafId);
+      resize();
+      seed();
+      rafId = requestAnimationFrame(draw);
+    });
+
+    reducedMQ.addEventListener('change', (e) => {
+      reduced = e.matches;
+      cancelAnimationFrame(rafId);
+      if (reduced) {
+        // draw once and stop
+        draw(performance.now());
+      } else {
+        rafId = requestAnimationFrame(draw);
+      }
+    });
+
+    resize();
+    seed();
+    if (reduced) {
+      draw(performance.now()); // one static frame
+    } else {
+      rafId = requestAnimationFrame(draw);
+    }
+  }
+</script>
