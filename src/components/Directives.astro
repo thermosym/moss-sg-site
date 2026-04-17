@@ -1,0 +1,70 @@
+---
+import { STRINGS, type Locale } from '@/data/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = STRINGS[locale].directives;
+---
+
+<section class="directives" aria-labelledby="directives-heading">
+  <h2 id="directives-heading" class="section-heading">{t.heading}</h2>
+  <ol class="list">
+    {
+      t.items.map((d) => (
+        <li>
+          <span class="num">{d.n}.</span>
+          <div class="body">
+            <p class="en">{d.en}</p>
+            <p class="zh">{d.zh}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .section-heading {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-amber);
+    letter-spacing: 0.12em;
+    margin: 0 0 2rem;
+  }
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  li {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+  }
+  .num {
+    font-family: var(--font-mono);
+    color: var(--color-amber);
+    letter-spacing: 0.1em;
+  }
+  .body p {
+    margin: 0;
+    line-height: 1.7;
+  }
+  .en {
+    font-family: var(--font-mono);
+    color: var(--color-ink);
+  }
+  .zh {
+    font-family: var(--font-serif-cn);
+    color: var(--color-ink-dim);
+    font-size: 0.95rem;
+    margin-top: 0.25rem !important;
+  }
+</style>
