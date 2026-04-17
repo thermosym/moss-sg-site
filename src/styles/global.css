@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/geist-mono';
 
-/* LXGW WenKai Screen (Chinese) via jsdelivr */
-@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-web@1.7.0/style.css');
+/* LXGW WenKai Screen (Chinese) is loaded via <link> in Base.astro to avoid
+   @import ordering issues after @fontsource expansion. */
 
 @theme {
   /* Colors — deep space base, moss amber accent, subtle moss green */
