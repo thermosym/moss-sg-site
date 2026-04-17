@@ -1,3 +1,60 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/geist-mono';
 
-/* design tokens land here in the next task */
+/* LXGW WenKai Screen (Chinese) via jsdelivr */
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-web@1.7.0/style.css');
+
+@theme {
+  /* Colors — deep space base, moss amber accent, subtle moss green */
+  --color-void: #05070d;
+  --color-deep: #0a0f1c;
+  --color-ink: #e6e8ef;
+  --color-ink-dim: #8a93a6;
+  --color-amber: #ff7a45;       /* MOSS eye */
+  --color-amber-glow: #ffb08a;
+  --color-moss: #6fae7a;
+  --color-status-active: #22c55e;
+  --color-status-wip: #f59e0b;
+  --color-status-archived: #6b7280;
+
+  /* Fonts */
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-serif-cn: 'LXGW WenKai Screen', 'LXGW WenKai', 'Noto Serif CJK SC', serif;
+}
+
+html,
+body {
+  background: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html[lang^='zh'] body {
+  /* CN body text leans on LXGW WenKai; code-ish elements stay mono */
+  font-family: var(--font-serif-cn);
+}
+
+/* Reduced motion: strip animations and transitions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Selection */
+::selection {
+  background: var(--color-amber);
+  color: var(--color-void);
+}
+
+/* Hide scrollbar track noise (keep function) */
+html {
+  scrollbar-color: var(--color-ink-dim) transparent;
+}
