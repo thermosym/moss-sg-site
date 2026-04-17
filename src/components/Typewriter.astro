@@ -1,0 +1,119 @@
+---
+interface Props {
+  lines: string[];
+  /** ms per character */
+  speed?: number;
+  /** ms between lines */
+  linePause?: number;
+  /** ms delay before starting */
+  startDelay?: number;
+  class?: string;
+}
+
+const {
+  lines,
+  speed = 32,
+  linePause = 360,
+  startDelay = 120,
+  class: className = '',
+} = Astro.props;
+
+const payload = JSON.stringify({ lines, speed, linePause, startDelay });
+---
+
+<div class={`moss-typewriter ${className}`.trim()} data-tw={payload}>
+  {
+    lines.map((line, i) => (
+      <div class="tw-line" data-i={i}>
+        <span class="tw-text" aria-label={line}></span>
+        <span class="tw-cursor" aria-hidden="true">_</span>
+      </div>
+    ))
+  }
+  <noscript>
+    {lines.map((line) => <div>{line}</div>)}
+  </noscript>
+</div>
+
+<style>
+  .moss-typewriter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: var(--color-ink);
+  }
+  .tw-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.15ch;
+    min-height: 1.4em;
+  }
+  .tw-cursor {
+    display: inline-block;
+    color: var(--color-amber);
+    animation: tw-blink 1s steps(1) infinite;
+  }
+  .tw-line:not(.tw-done) .tw-cursor {
+    opacity: 1;
+  }
+  .tw-line.tw-done .tw-cursor {
+    opacity: 0.35;
+  }
+  @keyframes tw-blink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tw-cursor {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  type TwConfig = { lines: string[]; speed: number; linePause: number; startDelay: number };
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('.moss-typewriter').forEach((root) => {
+    const cfg = JSON.parse(root.dataset.tw || '{}') as TwConfig;
+    const lines = Array.from(root.querySelectorAll<HTMLElement>('.tw-line'));
+
+    if (reduced) {
+      lines.forEach((el, i) => {
+        const span = el.querySelector<HTMLElement>('.tw-text');
+        if (span) span.textContent = cfg.lines[i] ?? '';
+        el.classList.add('tw-done');
+      });
+      return;
+    }
+
+    const run = async () => {
+      await wait(cfg.startDelay);
+      for (let i = 0; i < lines.length; i++) {
+        const el = lines[i];
+        const span = el.querySelector<HTMLElement>('.tw-text');
+        if (!span) continue;
+        const text = cfg.lines[i] ?? '';
+        for (let c = 0; c < text.length; c++) {
+          span.textContent = text.slice(0, c + 1);
+          await wait(cfg.speed);
+        }
+        el.classList.add('tw-done');
+        await wait(cfg.linePause);
+      }
+    };
+
+    run();
+  });
+
+  function wait(ms: number): Promise<void> {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+</script>
