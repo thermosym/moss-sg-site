@@ -1,0 +1,40 @@
+---
+import Base from '@/layouts/Base.astro';
+
+const locale = 'en' as const;
+---
+
+<Base locale={locale}>
+  <section class="not-found">
+    <p class="prompt">&gt; ERROR: Path not in this galaxy.</p>
+    <p class="sub">Try <a href="/">moss.sg</a>.</p>
+  </section>
+</Base>
+
+<style>
+  .not-found {
+    padding-top: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .prompt {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    color: var(--color-amber);
+    margin: 0;
+  }
+  .sub {
+    font-family: var(--font-mono);
+    color: var(--color-ink-dim);
+    margin: 0;
+  }
+  .sub a {
+    color: var(--color-ink);
+    border-bottom: 1px dashed var(--color-amber);
+    text-decoration: none;
+  }
+  .sub a:hover {
+    color: var(--color-amber);
+  }
+</style>

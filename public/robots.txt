@@ -1,0 +1,6 @@
+# Moss doesn't fight crawlers. It outlives them.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://moss.sg/sitemap-index.xml
