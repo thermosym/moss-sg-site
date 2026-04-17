@@ -1,0 +1,83 @@
+---
+import Typewriter from '@/components/Typewriter.astro';
+import { STRINGS, type Locale } from '@/data/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = STRINGS[locale].hero;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <h1 id="hero-title" class="title">
+    moss<button
+      type="button"
+      class="title-dot"
+      data-easter-trigger
+      aria-label={t.easter}
+      title={t.easter}>.</button
+    >
+  </h1>
+  <Typewriter lines={t.boot as [string, string]} class="boot" />
+  <p class="byline">{t.byline}</p>
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-top: 2rem;
+  }
+  .title {
+    font-family: var(--font-mono);
+    font-size: clamp(3rem, 10vw, 6.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin: 0;
+    color: var(--color-ink);
+  }
+  .title-dot {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: var(--color-amber);
+    cursor: pointer;
+    position: relative;
+    animation: dot-pulse 3.4s ease-in-out infinite;
+  }
+  .title-dot:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+  @keyframes dot-pulse {
+    0%, 100% {
+      text-shadow: 0 0 0 rgba(255, 122, 69, 0);
+    }
+    50% {
+      text-shadow: 0 0 24px rgba(255, 122, 69, 0.6);
+    }
+  }
+  .boot {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--color-ink-dim);
+  }
+  .byline {
+    font-size: 0.95rem;
+    color: var(--color-ink-dim);
+    max-width: 40rem;
+    line-height: 1.7;
+    margin: 0.5rem 0 0;
+  }
+  html[lang^='zh'] .byline {
+    font-family: var(--font-serif-cn);
+    font-size: 1.05rem;
+  }
+</style>

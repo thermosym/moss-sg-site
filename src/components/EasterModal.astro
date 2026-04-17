@@ -1,0 +1,75 @@
+---
+import { STRINGS, type Locale } from '@/data/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const quote = STRINGS[locale].footer.quote;
+const closeLabel = STRINGS[locale].easterModalClose;
+---
+
+<dialog id="moss-easter" aria-label="MOSS quote">
+  <div class="easter-body">
+    <p class="easter-quote">{quote}</p>
+    <p class="easter-sig">— MOSS · 550W</p>
+    <form method="dialog">
+      <button type="submit">{closeLabel}</button>
+    </form>
+  </div>
+</dialog>
+
+<style>
+  dialog {
+    background: var(--color-deep);
+    color: var(--color-ink);
+    border: 1px solid rgba(255, 122, 69, 0.4);
+    border-radius: 6px;
+    padding: 2rem;
+    max-width: 32rem;
+    font-family: var(--font-mono);
+  }
+  dialog::backdrop {
+    background: rgba(5, 7, 13, 0.72);
+    backdrop-filter: blur(3px);
+  }
+  .easter-quote {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0 0 1rem;
+  }
+  html[lang^='zh'] .easter-quote {
+    font-family: var(--font-serif-cn);
+    font-size: 1.2rem;
+  }
+  .easter-sig {
+    color: var(--color-amber);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    margin: 0 0 1.5rem;
+  }
+  button {
+    background: transparent;
+    color: var(--color-ink-dim);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    cursor: pointer;
+  }
+  button:hover {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+</style>
+
+<script>
+  const dlg = document.getElementById('moss-easter') as HTMLDialogElement | null;
+  document.querySelectorAll<HTMLElement>('[data-easter-trigger]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      dlg?.showModal();
+    });
+  });
+</script>
