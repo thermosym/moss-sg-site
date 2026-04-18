@@ -22,6 +22,17 @@ export const PROJECTS: Project[] = [
     updated: '2026-04',
   },
   {
+    name: 'BrewMap',
+    url: 'https://brewmap.moss.sg',
+    status: 'WIP',
+    description: {
+      en: "A structured map of Singapore's specialty coffee scene — roasters, beans, and tasting notes.",
+      zh: '新加坡精品咖啡豆地图 —— 烘焙商、豆单、风味笔记的结构化索引。',
+    },
+    tech: 'Astro · TypeScript · Cloudflare Pages',
+    updated: '2026-04',
+  },
+  {
     name: 'sbti',
     url: 'https://sbti.moss.sg',
     status: 'WIP',
